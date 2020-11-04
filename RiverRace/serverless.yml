@@ -1,8 +1,11 @@
-service: riverrace
+service: RiverRaceStats
 app: savage-octopus
 org: evanschalton
 
 frameworkVersion: '2'
+
+custom:
+  RiverRaceStatsTable: RiverRaceStats
 
 provider:
   name: aws
@@ -19,26 +22,38 @@ provider:
         - dynamodb:PutItem
         # - dynamodb:UpdateItem
         # - dynamodb:DeleteItem
-      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/RiverRace"
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:custom.RiverRaceStatsTable}"
 
+
+layers:
+  requestslayer:
+    path: layers
+    compatibleRuntimes:
+      - python3.8
+    description: "Adds requests for api call"
 
 # I'm going to include a real API key just to make it easier for you to
 # test and get setup, honor system here, but please get your own -- it takes 5 minutes at:
 # https://developer.clashroyale.com/
 
 functions:
-  riverrace:
+  RiverRaceStatsLambda:
     handler: handler.riverrace
+    layers:
+      - {Ref: RequestslayerLambdaLayer}
     environment:
       CR_API_KEY: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiIsImtpZCI6IjI4YTMxOGY3LTAwMDAtYTFlYi03ZmExLTJjNzQzM2M2Y2NhNSJ9.eyJpc3MiOiJzdXBlcmNlbGwiLCJhdWQiOiJzdXBlcmNlbGw6Z2FtZWFwaSIsImp0aSI6IjZjM2IzYWU0LWZiYTUtNDRkOC04NTAyLTRmMmM0ODY0MDBmYiIsImlhdCI6MTU4MzQ3ODE2Mywic3ViIjoiZGV2ZWxvcGVyLzQ5NmEwMGU5LTA1NjgtMGZjMi1mZTQ5LTZhODZhYmRlNDBmZiIsInNjb3BlcyI6WyJyb3lhbGUiXSwibGltaXRzIjpbeyJ0aWVyIjoiZGV2ZWxvcGVyL3NpbHZlciIsInR5cGUiOiJ0aHJvdHRsaW5nIn0seyJjaWRycyI6WyIxMjguMTI4LjEyOC4xMjgiXSwidHlwZSI6ImNsaWVudCJ9XX0.bw_XKErf8ZSH6x0sUSzMs1c6IqWj9eBj7Zb5i87If_fPVDvXIKxZph4blMKO6LYvlIJAb5X_Vdt6lnAysrVnYQ
       CLAN_TAGS: '#GPR2JUQ,#Y00PPQ8Y' # <-- you'll want to put your clan(s) tag(s) here
+      RiverRaceStatsTable: ${self:custom.RiverRaceStatsTable}
 
 resources:
   Resources:
-    RiverRace:
+    RiverRaceStats:
       Type: AWS::DynamoDB::Table
+      DeletionPolicy: Retain
+      UpdateReplacePolicy: Retain
       Properties:
-        TableName: RiverRace
+        TableName: ${self:custom.RiverRaceStatsTable}
         AttributeDefinitions:
           - AttributeName: clanTag
             AttributeType: S

@@ -11,7 +11,7 @@ def getAPIKey():
     # this helps w/ rate limiting
     return os.environ['CR_API_KEY']
 
-def getClanTags()
+def getClanTags():
     # splits & strips the csv of clantags and reurns a list
     return [i.strip() for i in os.environ['CLAN_TAGS'].split(",")]
 
@@ -47,7 +47,7 @@ def riverrace(event, context):
     # Also need error handling here.....
     print(event, context)
     client = boto3.resource('dynamodb')
-    table = client.Table("RiverRace")
+    table = client.Table(os.environ["RiverRaceStatsTable"])
 
     pullTime = datetime.datetime.now().isoformat()
 
