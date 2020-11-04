@@ -1,0 +1,54 @@
+service: riverrace
+app: savage-octopus
+org: evanschalton
+
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  runtime: python3.8
+  stage: dev
+  region: us-east-1
+    
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        # - dynamodb:Query
+        # - dynamodb:Scan
+        # - dynamodb:GetItem
+        - dynamodb:PutItem
+        # - dynamodb:UpdateItem
+        # - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/RiverRace"
+
+
+# I'm going to include a real API key just to make it easier for you to
+# test and get setup, honor system here, but please get your own -- it takes 5 minutes at:
+# https://developer.clashroyale.com/
+
+functions:
+  riverrace:
+    handler: handler.riverrace
+    environment:
+      CR_API_KEY: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiIsImtpZCI6IjI4YTMxOGY3LTAwMDAtYTFlYi03ZmExLTJjNzQzM2M2Y2NhNSJ9.eyJpc3MiOiJzdXBlcmNlbGwiLCJhdWQiOiJzdXBlcmNlbGw6Z2FtZWFwaSIsImp0aSI6IjZjM2IzYWU0LWZiYTUtNDRkOC04NTAyLTRmMmM0ODY0MDBmYiIsImlhdCI6MTU4MzQ3ODE2Mywic3ViIjoiZGV2ZWxvcGVyLzQ5NmEwMGU5LTA1NjgtMGZjMi1mZTQ5LTZhODZhYmRlNDBmZiIsInNjb3BlcyI6WyJyb3lhbGUiXSwibGltaXRzIjpbeyJ0aWVyIjoiZGV2ZWxvcGVyL3NpbHZlciIsInR5cGUiOiJ0aHJvdHRsaW5nIn0seyJjaWRycyI6WyIxMjguMTI4LjEyOC4xMjgiXSwidHlwZSI6ImNsaWVudCJ9XX0.bw_XKErf8ZSH6x0sUSzMs1c6IqWj9eBj7Zb5i87If_fPVDvXIKxZph4blMKO6LYvlIJAb5X_Vdt6lnAysrVnYQ
+      CLAN_TAGS: '#GPR2JUQ,#Y00PPQ8Y' # <-- you'll want to put your clan(s) tag(s) here
+
+resources:
+  Resources:
+    RiverRace:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: RiverRace
+        AttributeDefinitions:
+          - AttributeName: clanTag
+            AttributeType: S
+          - AttributeName: pullTime
+            AttributeType: S
+        KeySchema:
+          - AttributeName: clanTag
+            KeyType: HASH
+          - AttributeName: pullTime
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
