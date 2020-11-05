@@ -5,11 +5,16 @@ import requests
 import datetime
 import os
 
+import random
+
 
 def getAPIKey():
     # I use a function because in my deployment I have multiple api keys and randomly choose one
     # this helps w/ rate limiting
-    return os.environ['CR_API_KEY']
+
+    # Added the random choice so you can have multiple API keys and it'll randomly pick one
+    # To use for the API call
+    return random.choice([i.strip() for i in os.environ['CR_API_KEY'].split(",")])
 
 def getClanTags():
     # splits & strips the csv of clantags and reurns a list
