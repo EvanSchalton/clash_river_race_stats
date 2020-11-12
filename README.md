@@ -10,6 +10,8 @@ The old API used to make this easy, but alas another 'challenge' of CW2 -- so he
 
 In this repo is a serverless.yml that'll stand up a dynamoDB table and lambda function that will hit the CRL API and get your clan's current stats and save them to the DB.
 
+after cloning the repo run `pip install -t python/lib/python3.8/site-packages -r aws_requirements.txt` inside the layers folder to create the layer package
+
 The partition key is the clan tag, and sort key is the ISO datetime -- which should make retrieval for analytics pretty straight forward.
 
 Please signup for an API Key at `developer.clashroyale.com` with an IP address of `128.128.128.128` -- this uses the RoyalAPI proxy service so you need to register against their IP.
